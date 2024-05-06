@@ -1,0 +1,36 @@
+version: 2
+
+sources:
+  - name: movies
+    tags: ["sources_movies"]
+    schema: public
+    tables:
+    - name: credits
+      columns:
+        - name: movie_id
+        - name: title
+        - name: cast
+        - name: crew
+    - name: movies
+      columns:
+        - name: budget
+        - name: genres
+        - name: homepage
+        - name: id
+        - name: keywords
+        - name: original_language
+        - name: original_title
+        - name: overview
+        - name: popularity
+        - name: production_companies
+        - name: production_countries
+        - name: release_date
+        - name: revenue
+        - name: runtime
+        - name: spoken_languages
+        - name: status
+        - name: tagline
+        - name: title
+        - name: vote_average
+        - name: vote_count
+
