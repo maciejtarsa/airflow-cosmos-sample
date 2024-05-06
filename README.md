@@ -13,14 +13,15 @@ Sample data for db from https://github.com/zseta/postgres-docker-samples/tree/ma
 
 copy data into docker container
 ```
-docker cp data/schema.sql astro-dbt-core-sample_b4a9db-postgres-1:/schema.sql
-docker cp data/stocks/data/stocks.csv astro-dbt-core-sample_b4a9db-postgres-1:/stocks.csv
-docker cp data/movies/data/credits.csv astro-dbt-core-sample_b4a9db-postgres-1:/credits.csv
-docker cp data/movies/data/movies.csv astro-dbt-core-sample_b4a9db-postgres-1:/movies.csv
+export DB=$(docker ps --filter "name=postgres" --format '{{.Names}}' | cut -d' ' -f1)
+docker cp data/schema.sql $DB:/schema.sql
+docker cp data/stocks/data/stocks.csv $DB:/stocks.csv
+docker cp data/movies/data/credits.csv $DB:/credits.csv
+docker cp data/movies/data/movies.csv $DB:/movies.csv
 ```
 exec into the container
 ```
-docker exec -it astro-dbt-core-sample_b4a9db-postgres-1 psql -U postgres -d postgres
+docker exec -it $DB psql -U postgres -d postgres
 ```
 then create the schemas and copy data into tables
 ```
