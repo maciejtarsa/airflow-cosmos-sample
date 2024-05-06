@@ -1,0 +1,17 @@
+version: 2
+
+sources:
+  - name: stocks
+    tags: ["sources_stocks"]
+    schema: public
+    tables:
+    - name: stocks
+      columns:
+        - name: date
+        - name: symbol
+        - name: open
+        - name: high
+        - name: low
+        - name: close
+        - name: adj_close
+        - name: volume
