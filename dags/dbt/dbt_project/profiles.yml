@@ -1,0 +1,14 @@
+
+default:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: localhost
+      port: 5432
+      user: myuser
+      pass: mypassword
+      dbname: mydatabase
+      schema: myschema
+      threads: 4
+      keepalives_idle: 0

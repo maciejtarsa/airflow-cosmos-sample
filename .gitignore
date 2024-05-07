@@ -9,3 +9,5 @@ airflow-webserver.pid
 webserver_config.py
 airflow.cfg
 airflow.db
+logs/
+dags/dbt/dbt_project/target/
