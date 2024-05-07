@@ -7,7 +7,8 @@ an Airflow connection and injecting a variable into the dbt project.
 
 from airflow.decorators import dag
 from airflow.providers.postgres.operators.postgres import PostgresOperator
-from cosmos import DbtTaskGroup, ProjectConfig, ProfileConfig, ExecutionConfig
+from cosmos import DbtTaskGroup, ProjectConfig, ProfileConfig, ExecutionConfig, RenderConfig, LoadMode
+from cosmos.constants import TestIndirectSelection
 
 # adjust for other database types
 from cosmos.profiles import PostgresUserPasswordProfileMapping
@@ -41,6 +42,7 @@ profile_config = ProfileConfig(
 execution_config = ExecutionConfig(
     dbt_executable_path=DBT_EXECUTABLE_PATH,
     dbt_project_path=DBT_PROJECT_PATH,
+    test_indirect_selection=TestIndirectSelection.BUILDABLE
 )
 
 

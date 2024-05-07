@@ -1,0 +1,24 @@
+version: 2
+
+models:
+  - name: stocks_date_count
+    config:
+      contract:
+        enforced: true
+    description: >
+      Count the number of rows for each date
+    tests:
+      - greater_than_zero:
+          column_name: count
+    columns:
+      - name: date
+        description: >
+          The date
+        data_type: date
+        contraints:
+          - unique
+          - not_null
+      - name: count
+        description: >
+          Count per date
+        data_type: int

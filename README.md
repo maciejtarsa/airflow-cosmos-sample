@@ -3,16 +3,19 @@
 A sample dbt project with astonomer and airflow.
 Based off tutorial found here: https://docs.astronomer.io/learn/airflow-dbt
 
-To run the project:
-```
-astro dev start
-```
 
 The DAG is built from manifest, hence we need to manually create the manifest by running:
 ```
 cd dags/dbt/dbt_project
+rm -r target
+dbt deps
 dbt parse
 cd ../../..
+```
+
+To run the project:
+```
+astro dev start
 ```
 
 ## Sample data for Postgres db
