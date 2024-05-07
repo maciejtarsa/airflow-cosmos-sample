@@ -6,13 +6,13 @@ an Airflow connection and injecting a variable into the dbt project.
 """
 
 from airflow.decorators import dag
-from airflow.providers.postgres.operators.postgres import PostgresOperator
-from cosmos import DbtTaskGroup, ProjectConfig, ProfileConfig, ExecutionConfig, RenderConfig, DbtDag
+from cosmos import DbtTaskGroup, ProjectConfig, ProfileConfig, ExecutionConfig, RenderConfig
 from cosmos.constants import TestIndirectSelection
 
 # adjust for other database types
 from cosmos.profiles import PostgresUserPasswordProfileMapping
 from pendulum import datetime
+from airflow import DAG
 import os
 
 DB_NAME = "postgres"
@@ -45,45 +45,28 @@ execution_config = ExecutionConfig(
     test_indirect_selection=TestIndirectSelection.BUILDABLE
 )
 
-@dag(
-    start_date=datetime(2023, 8, 1),
-    schedule=None,
-    catchup=False,
-)
-def c_multiple_dags_stocks():
-    transform_stock_data = DbtTaskGroup(
-        render_config=RenderConfig(
-            select=["tag:stocks_dag"],
-        ),
-        group_id="transform_stock_data",
-        project_config=project_config,
-        profile_config=profile_config,
-        execution_config=execution_config,
-        default_args={"retries": 2},
-    )
+tags = ["stocks_dag", "movies_dag"]
 
-    transform_stock_data
+for tag in tags:
+    tag_1 = tag.split("_")[0]
 
-c_multiple_dags_stocks()
 
-@dag(
-    start_date=datetime(2023, 8, 1),
-    schedule=None,
-    catchup=False,
-)
-def c_multiple_dags_movies():
+    with DAG(
+        dag_id=f"c_multiple_dags_{tag_1}",
+        start_date=datetime(2023, 8, 1),
+        schedule=None,
+        catchup=False,
+    ) as dag:
+    
+        transform_data = DbtTaskGroup(
+            render_config=RenderConfig(
+                select=[f"tag:{tag}"],
+            ),
+            group_id=f"transform_{tag_1}_data",
+            project_config=project_config,
+            profile_config=profile_config,
+            execution_config=execution_config,
+            default_args={"retries": 2},
+        )
 
-    transform_movies_data = DbtTaskGroup(
-        render_config=RenderConfig(
-            select=["tag:movies_dag"],
-        ),
-        group_id="transform_movies_data",
-        project_config=project_config,
-        profile_config=profile_config,
-        execution_config=execution_config,
-        default_args={"retries": 2},
-    )
-
-    transform_movies_data
-
-c_multiple_dags_movies()
+        transform_data
