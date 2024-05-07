@@ -1,0 +1,33 @@
+version: 2
+
+models:
+  - name: cast_language
+    config:
+      contract:
+        enforced: true
+    description: >
+      Cast per title
+    columns:
+      - name: Title
+        description: >
+          Title of the film
+        data_type: text
+        contraints:
+          - unique
+          - not_null
+      - name: original_language
+        description: >
+          Original language of the film
+        data_type: text
+      - name: original_title
+        description: >
+          Original title of the film
+        data_type: text
+      - name: cast
+        description: >
+          Cast of the film
+        data_type: jsonb
+      - name: cast_count
+        description: >
+          Number of cast in the film
+        data_type: int

@@ -1,5 +1,7 @@
 name: 'dbt_project'
 
+profile: 'default'
+
 model-paths: ["models"]
 
 # files using the `{{ config(...) }}` macro.
@@ -8,18 +10,3 @@ models:
     +persist_docs:
       relation: true
       column: true
-    stocks_source:
-      schema: stocks
-      meterialized: view
-    stocks_date_count:
-      schema: stocks
-      meterialized: view
-    movies_source:
-      schema: movies
-      materialized: view
-    credits_source:
-      schema: movies
-      materialized: view
-    cast_language:
-      schema: movies
-      materialized: view

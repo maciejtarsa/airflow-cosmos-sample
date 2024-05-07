@@ -1,5 +1,9 @@
+{{ config(
+    tags=["stocks_dag"]
+) }}
+
 SELECT
-    date,
-    COUNT(*) as count
+    CAST (date AS DATE) AS date,
+    CAST (COUNT(*) AS INT) as count
 FROM {{ ref('stocks_source') }}
 GROUP BY 1

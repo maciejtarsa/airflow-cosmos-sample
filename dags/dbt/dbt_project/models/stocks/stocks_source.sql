@@ -1,3 +1,8 @@
+{{ config(
+    tags=["stocks_dag"]
+) }}
+
+
 SELECT 
     date, 
     symbol, 
