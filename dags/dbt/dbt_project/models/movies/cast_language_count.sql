@@ -1,3 +1,7 @@
+{{ config(
+    tags=["movies_dag"]
+) }}
+
 SELECT
     title,
     cast_count

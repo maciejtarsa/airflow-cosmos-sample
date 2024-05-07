@@ -45,21 +45,45 @@ execution_config = ExecutionConfig(
     test_indirect_selection=TestIndirectSelection.BUILDABLE
 )
 
-
 @dag(
     start_date=datetime(2023, 8, 1),
     schedule=None,
     catchup=False,
 )
-def a_one_big_dag():
-    transform_data = DbtTaskGroup(
-        group_id="transform_all_data",
+def c_multiple_dags_stocks():
+    transform_stock_data = DbtTaskGroup(
+        render_config=RenderConfig(
+            select=["tag:stocks_dag"],
+        ),
+        group_id="transform_stock_data",
         project_config=project_config,
         profile_config=profile_config,
         execution_config=execution_config,
         default_args={"retries": 2},
     )
 
-    transform_data
+    transform_stock_data
 
-a_one_big_dag()
+c_multiple_dags_stocks()
+
+@dag(
+    start_date=datetime(2023, 8, 1),
+    schedule=None,
+    catchup=False,
+)
+def c_multiple_dags_movies():
+
+    transform_movies_data = DbtTaskGroup(
+        render_config=RenderConfig(
+            select=["tag:movies_dag"],
+        ),
+        group_id="transform_movies_data",
+        project_config=project_config,
+        profile_config=profile_config,
+        execution_config=execution_config,
+        default_args={"retries": 2},
+    )
+
+    transform_movies_data
+
+c_multiple_dags_movies()

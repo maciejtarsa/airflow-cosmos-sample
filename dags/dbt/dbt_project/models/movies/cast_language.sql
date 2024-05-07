@@ -1,3 +1,7 @@
+{{ config(
+    tags=["movies_dag"]
+) }}
+
 SELECT
     movies.title,
     movies.original_language,
