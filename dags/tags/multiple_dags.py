@@ -13,6 +13,7 @@ from cosmos.constants import TestIndirectSelection
 from cosmos.profiles import PostgresUserPasswordProfileMapping
 from pendulum import datetime
 from airflow import DAG
+from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 import os
 
 DB_NAME = "postgres"
@@ -45,11 +46,14 @@ execution_config = ExecutionConfig(
     test_indirect_selection=TestIndirectSelection.BUILDABLE
 )
 
-tags = ["stocks_dag", "movies_dag"]
+tags = [
+    {"tag": "stocks_dag"},
+    {"tag": "movies_dag"}
+]
 
-for tag in tags:
+for index, item in enumerate(tags):
+    tag = item.get('tag')
     tag_1 = tag.split("_")[0]
-
 
     with DAG(
         dag_id=f"c_multiple_dags_{tag_1}",
@@ -57,6 +61,8 @@ for tag in tags:
         schedule=None,
         catchup=False,
     ) as dag:
+        
+        
     
         transform_data = DbtTaskGroup(
             render_config=RenderConfig(
@@ -69,4 +75,17 @@ for tag in tags:
             default_args={"retries": 2},
         )
 
-        transform_data
+        if index != len(tags) - 1:
+            next_dag_id = f"""c_multiple_dags_{tags[index + 1].get('tag').split("_")[0]}"""
+            trigger = TriggerDagRunOperator(
+                task_id="trigger_next_dag",
+                trigger_dag_id=next_dag_id,
+                conf={"message":"Message to pass to c_multiple_dags_movies."},
+                trigger_rule="all_done", # trigger even if previous task failed
+            )
+
+            
+            transform_data >> trigger
+        else:
+            transform_data
+

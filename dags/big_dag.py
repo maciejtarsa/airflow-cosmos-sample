@@ -6,13 +6,13 @@ an Airflow connection and injecting a variable into the dbt project.
 """
 
 from airflow.decorators import dag
-from airflow.providers.postgres.operators.postgres import PostgresOperator
-from cosmos import DbtTaskGroup, ProjectConfig, ProfileConfig, ExecutionConfig, RenderConfig, DbtDag
+from cosmos import DbtTaskGroup, ProjectConfig, ProfileConfig, ExecutionConfig
 from cosmos.constants import TestIndirectSelection
 
 # adjust for other database types
 from cosmos.profiles import PostgresUserPasswordProfileMapping
 from pendulum import datetime
+from airflow.operators.dummy_operator import DummyOperator
 import os
 
 DB_NAME = "postgres"
@@ -45,7 +45,6 @@ execution_config = ExecutionConfig(
     test_indirect_selection=TestIndirectSelection.BUILDABLE
 )
 
-
 @dag(
     start_date=datetime(2023, 8, 1),
     schedule=None,
@@ -60,6 +59,11 @@ def a_one_big_dag():
         default_args={"retries": 2},
     )
 
-    transform_data
+    start_task = DummyOperator(task_id='start_task')
+
+    end_task = DummyOperator(task_id='end_task')
+
+    start_task >> transform_data >> end_task
+    
 
 a_one_big_dag()
