@@ -6,13 +6,14 @@ an Airflow connection and injecting a variable into the dbt project.
 """
 
 from airflow.decorators import dag
-from airflow.providers.postgres.operators.postgres import PostgresOperator
-from cosmos import DbtTaskGroup, ProjectConfig, ProfileConfig, ExecutionConfig, RenderConfig, DbtDag
+from cosmos import DbtTaskGroup, ProjectConfig, ProfileConfig, ExecutionConfig
 from cosmos.constants import TestIndirectSelection
 
 # adjust for other database types
 from cosmos.profiles import PostgresUserPasswordProfileMapping
 from pendulum import datetime
+from airflow.operators.dummy_operator import DummyOperator
+from airflow.operators.python_operator import PythonOperator
 import os
 
 DB_NAME = "postgres"
@@ -22,6 +23,7 @@ DBT_PROJECT_PATH = f"{os.environ['AIRFLOW_HOME']}/dags/dbt/dbt_project"
 # The path where Cosmos will find the dbt executable
 # in the virtual environment created in the Dockerfile
 DBT_EXECUTABLE_PATH = f"{os.environ['AIRFLOW_HOME']}/dbt_venv/bin/dbt"
+from airflow.utils.email import send_email
 
 manifest_path = f"{DBT_PROJECT_PATH}/target/manifest.json"
 
@@ -45,6 +47,32 @@ execution_config = ExecutionConfig(
     test_indirect_selection=TestIndirectSelection.BUILDABLE
 )
 
+def send_success_status_email(context):
+    task_instance = context['task_instance']
+    task_status = task_instance.current_state()
+
+    subject = f"Airflow Task {task_instance.task_id} {task_status}"
+    body = f"The task {task_instance.task_id} finished with status: {task_status}.\n\n" \
+           f"Task execution date: {context['execution_date']}\n" \
+           f"Log URL: {task_instance.log_url}\n\n"
+
+    to_email = "abc@example.com"  # Specify the recipient email address
+
+    send_email(to=to_email, subject=subject, html_content=body)
+
+def send_failure_status_email(context):
+    task_instance = context['task_instance']
+    task_status = task_instance.current_state()
+
+    subject = f"Airflow Task {task_instance.task_id} {task_status}"
+    body = f"The task {task_instance.task_id} finished with status: {task_status}.\n\n" \
+           f"Task execution date: {context['execution_date']}\n" \
+           f"Log URL: {task_instance.log_url}\n\n"
+
+    to_email = "abc@example.com"  # Specify the recipient email address
+
+    send_email(to=to_email, subject=subject, html_content=body)
+
 
 @dag(
     start_date=datetime(2023, 8, 1),
@@ -60,6 +88,30 @@ def a_one_big_dag():
         default_args={"retries": 2},
     )
 
-    transform_data
+    start_task = DummyOperator(task_id='start_task')
+
+    end_task = DummyOperator(task_id='end_task')
+
+    success_email_task = PythonOperator(
+        task_id='success_email_task',
+        python_callable=send_success_status_email,
+        provide_context=True,
+        dag=dag
+    )
+
+    failure_email_task = PythonOperator(
+        task_id='failure_email_task',
+        python_callable=send_failure_status_email,
+        provide_context=True,
+        dag=dag
+    )
+
+    # Set the on_success_callback and on_failure_callback
+    success_email_task.set_upstream(transform_data)
+    failure_email_task.set_upstream(transform_data)
+
+    start_task >> transform_data >> end_task
+    
 
 a_one_big_dag()
+
