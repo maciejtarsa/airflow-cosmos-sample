@@ -46,14 +46,14 @@ execution_config = ExecutionConfig(
     test_indirect_selection=TestIndirectSelection.BUILDABLE
 )
 
-tags = [
-    {"tag": "stocks_dag"},
-    {"tag": "movies_dag"}
+tags_dict = [
+    {"tag": ["stocks_dag", "movies_dag"]},
+    {"tag": ["movies_dag"]}
 ]
 
-for index, item in enumerate(tags):
-    tag = item.get('tag')
-    tag_1 = tag.split("_")[0]
+for index, item in enumerate(tags_dict):
+    tags = item.get('tag')
+    tag_1 = tags[0].split("_")[0]
 
     with DAG(
         dag_id=f"c_multiple_dags_{tag_1}",
@@ -66,7 +66,7 @@ for index, item in enumerate(tags):
     
         transform_data = DbtTaskGroup(
             render_config=RenderConfig(
-                select=[f"tag:{tag}"],
+                select=[f"tag:{tag}" for tag in tags],
             ),
             group_id=f"transform_{tag_1}_data",
             project_config=project_config,
@@ -75,8 +75,8 @@ for index, item in enumerate(tags):
             default_args={"retries": 2},
         )
 
-        if index != len(tags) - 1:
-            next_dag_id = f"""c_multiple_dags_{tags[index + 1].get('tag').split("_")[0]}"""
+        if index != len(tags_dict) - 1:
+            next_dag_id = f"""c_multiple_dags_{tags_dict[index + 1].get('tag')[0].split("_")[0]}"""
             trigger = TriggerDagRunOperator(
                 task_id="trigger_next_dag",
                 trigger_dag_id=next_dag_id,
