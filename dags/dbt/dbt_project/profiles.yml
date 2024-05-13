@@ -6,9 +6,9 @@ default:
       type: postgres
       host: localhost
       port: 5432
-      user: myuser
-      pass: mypassword
-      dbname: mydatabase
-      schema: myschema
+      user: postgres
+      pass: postgres
+      dbname: postgres
+      schema: postgres
       threads: 4
       keepalives_idle: 0
