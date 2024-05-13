@@ -1,6 +1,27 @@
 version: 2
 
 models:
+  - name: cast_language_count
+    config:
+      contract:
+        enforced: true
+    description: >
+      Number of cast per title
+    tests:
+      - greater_than_zero:
+          column_name: cast_count
+    columns:
+      - name: Title
+        description: >
+          Title of the film
+        data_type: text
+        contraints:
+          - unique
+          - not_null
+      - name: cast_count
+        description: >
+          Number of cast in the film
+        data_type: int
   - name: cast_language
     config:
       contract:

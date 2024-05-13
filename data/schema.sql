@@ -37,4 +37,4 @@ CREATE TABLE stocks (
     close DOUBLE PRECISION NULL,
     adj_close DOUBLE PRECISION NULL,
     volume BIGINT NULL
-);
+)

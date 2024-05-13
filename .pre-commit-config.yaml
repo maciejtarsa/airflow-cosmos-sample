@@ -1,0 +1,12 @@
+repos:
+- repo: https://github.com/dbt-checkpoint/dbt-checkpoint
+  rev: v1.2.1
+  hooks:
+  - id: check-script-semicolon
+    args: ["--manifest", "dags/dbt/dbt_project/target/manifest.json"]
+  - id: check-script-has-no-table-name
+    args: ["--manifest", "dags/dbt/dbt_project/target/manifest.json"]
+  # - id: check-model-has-all-columns
+  #   args: ["--manifest", "dags/dbt/dbt_project/target/manifest.json", "--catalog", "dags/dbt/dbt_project/target/catalog.json"]
+  - id: check-model-columns-have-desc
+    args: ["--manifest", "dags/dbt/dbt_project/target/manifest.json"]

@@ -10,6 +10,7 @@ cd dags/dbt/dbt_project
 rm -r target
 dbt deps
 dbt parse
+dbt docs generate
 cd ../../..
 ```
 
@@ -39,4 +40,11 @@ then create the schemas and copy data into tables
 \copy stocks FROM '/stocks.csv' DELIMITER ',' CSV HEADER;
 \copy credits FROM '/credits.csv' DELIMITER ',' CSV HEADER;
 \copy movies FROM '/movies.csv' DELIMITER ',' CSV HEADER;
+```
+
+## Pre-commig hooks
+
+With manifest and docs generated, you can run pre-commit hooks like:
+```
+pre-commit run --all-files
 ```
